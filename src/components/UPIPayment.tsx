@@ -25,14 +25,24 @@ export default function PaymentPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setError(''); // Clear any previous errors
+
+    if (name === 'amount') {
+      // Ensure amount is a valid number and within limits
+      const numValue = parseFloat(value);
+      if (numValue > UPI_LIMITS.MAX_AMOUNT) {
+        setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
+        return;
+      }
+    }
+
     setPaymentDetails(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'amount' ? parseFloat(value) || 0 : value
     }));
   };
 
   const validateAmount = (amount: number): boolean => {
-    if (amount <= 0) {
+    if (isNaN(amount) || amount <= 0) {
       setError('Please enter a valid amount');
       return false;
     }
@@ -61,24 +71,29 @@ export default function PaymentPage() {
       setError('Please enter a valid UPI ID (e.g., username@upi)');
       return;
     }
-    
-    try {
-      // Construct UPI URL with proper encoding
-      const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=${encodeURIComponent('Merchant')}&tn=${encodeURIComponent(paymentDetails.description)}&am=${paymentDetails.amount}&cu=INR`;
-      
-      // Create and click a hidden link to trigger the UPI app
-      const link = document.createElement('a');
-      link.href = upiUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
 
-      // Fallback for mobile devices
-      setTimeout(() => {
+    try {
+      // Format amount to exactly 2 decimal places
+      const formattedAmount = paymentDetails.amount.toFixed(2);
+      
+      // Construct UPI URL with proper encoding and formatted amount
+      const upiParams = new URLSearchParams({
+        pa: paymentDetails.upiId,
+        pn: 'Merchant',
+        tn: paymentDetails.description,
+        am: formattedAmount,
+        cu: 'INR'
+      });
+      
+      const upiUrl = `upi://pay?${upiParams.toString()}`;
+
+      // For mobile devices, try to open the UPI app directly
+      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         window.location.href = upiUrl;
-      }, 100);
+      } else {
+        // For desktop, show a message that this needs to be opened on a mobile device
+        setError('Please open this payment page on your mobile device to use UPI payment.');
+      }
     } catch (err) {
       setError('Failed to initiate UPI payment. Please try again.');
     }
@@ -119,7 +134,7 @@ export default function PaymentPage() {
                 step="0.01"
                 className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border border-gray-300 rounded-md p-2"
                 placeholder="0.00"
-                value={paymentDetails.amount}
+                value={paymentDetails.amount || ''}
                 onChange={handleInputChange}
               />
             </div>
