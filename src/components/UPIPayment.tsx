@@ -7,52 +7,81 @@ interface PaymentDetails {
   upiId: string;
 }
 
-export default function UPIPayment() {
+// UPI transaction limits as per NPCI guidelines
+const UPI_LIMITS = {
+  MIN_AMOUNT: 1,
+  MAX_AMOUNT: 100000, // ₹1,00,000 per transaction
+  MAX_DAILY: 200000,  // ₹2,00,000 per day
+};
+
+export default function PaymentPage() {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     amount: 0,
     description: '',
     upiId: '',
   });
+  const [error, setError] = useState<string>('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setError(''); // Clear any previous errors
     setPaymentDetails(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
+  const validateAmount = (amount: number): boolean => {
+    if (amount <= 0) {
+      setError('Please enter a valid amount');
+      return false;
+    }
+    if (amount < UPI_LIMITS.MIN_AMOUNT) {
+      setError(`Minimum transaction amount is ₹${UPI_LIMITS.MIN_AMOUNT}`);
+      return false;
+    }
+    if (amount > UPI_LIMITS.MAX_AMOUNT) {
+      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
+      return false;
+    }
+    return true;
+  };
+
   const handleUPIPayment = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
     // Validate amount
-    if (paymentDetails.amount <= 0) {
-      alert('Please enter a valid amount');
+    if (!validateAmount(paymentDetails.amount)) {
       return;
     }
 
     // Validate UPI ID format
     if (!paymentDetails.upiId.includes('@')) {
-      alert('Please enter a valid UPI ID (e.g., username@upi)');
+      setError('Please enter a valid UPI ID (e.g., username@upi)');
       return;
     }
     
-    // Construct UPI URL with proper encoding
-    const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=${encodeURIComponent('Merchant')}&tn=${encodeURIComponent(paymentDetails.description)}&am=${paymentDetails.amount}&cu=INR`;
-    
-    // Create and click a hidden link to trigger the UPI app
-    const link = document.createElement('a');
-    link.href = upiUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Construct UPI URL with proper encoding
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=${encodeURIComponent('Merchant')}&tn=${encodeURIComponent(paymentDetails.description)}&am=${paymentDetails.amount}&cu=INR`;
+      
+      // Create and click a hidden link to trigger the UPI app
+      const link = document.createElement('a');
+      link.href = upiUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-    // Fallback for mobile devices
-    setTimeout(() => {
-      window.location.href = upiUrl;
-    }, 100);
+      // Fallback for mobile devices
+      setTimeout(() => {
+        window.location.href = upiUrl;
+      }, 100);
+    } catch (err) {
+      setError('Failed to initiate UPI payment. Please try again.');
+    }
   };
 
   return (
@@ -64,6 +93,12 @@ export default function UPIPayment() {
             Make Payment
           </h2>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleUPIPayment} className="space-y-6">
           <div>
@@ -79,7 +114,8 @@ export default function UPIPayment() {
                 name="amount"
                 id="amount"
                 required
-                min="1"
+                min={UPI_LIMITS.MIN_AMOUNT}
+                max={UPI_LIMITS.MAX_AMOUNT}
                 step="0.01"
                 className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border border-gray-300 rounded-md p-2"
                 placeholder="0.00"
@@ -87,6 +123,9 @@ export default function UPIPayment() {
                 onChange={handleInputChange}
               />
             </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Limit: ₹{UPI_LIMITS.MIN_AMOUNT} - ₹{UPI_LIMITS.MAX_AMOUNT.toLocaleString()} per transaction
+            </p>
           </div>
 
           <div>
