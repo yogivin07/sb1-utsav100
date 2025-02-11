@@ -10,8 +10,8 @@ interface PaymentDetails {
 // Updated UPI transaction limits to be more conservative
 const UPI_LIMITS = {
   MIN_AMOUNT: 1,
-  MAX_AMOUNT: 5000, // Reduced to ₹5,000 per transaction to avoid bank limits
-  MAX_DAILY: 25000,  // Reduced to ₹25,000 per day
+  MAX_AMOUNT: 5000,
+  MAX_DAILY: 25000,
 };
 
 export default function PaymentPage() {
@@ -24,10 +24,9 @@ export default function PaymentPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setError(''); // Clear any previous errors
+    setError('');
 
     if (name === 'amount') {
-      // Ensure amount is a valid number and within limits
       const numValue = parseFloat(value);
       if (numValue > UPI_LIMITS.MAX_AMOUNT) {
         setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
@@ -51,16 +50,8 @@ export default function PaymentPage() {
       return false;
     }
     if (amount > UPI_LIMITS.MAX_AMOUNT) {
-      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}. Please try a smaller amount or contact your bank for higher limits.`);
+      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}. Please try a smaller amount.`);
       return false;
-    }
-    // Additional check for reasonable transaction amount
-    if (amount > 1000) {
-      const confirmed = window.confirm(`You are about to make a payment of ₹${amount}. Are you sure you want to proceed?`);
-      if (!confirmed) {
-        setError('Transaction cancelled');
-        return false;
-      }
     }
     return true;
   };
@@ -69,37 +60,26 @@ export default function PaymentPage() {
     e.preventDefault();
     setError('');
     
-    // Validate amount
     if (!validateAmount(paymentDetails.amount)) {
       return;
     }
 
-    // Validate UPI ID format
     if (!paymentDetails.upiId.includes('@')) {
       setError('Please enter a valid UPI ID (e.g., username@upi)');
       return;
     }
 
     try {
-      // Format amount to exactly 2 decimal places and ensure it's a small amount for testing
-      const formattedAmount = paymentDetails.amount.toFixed(2);
+      // Remove any trailing zeros and decimal if whole number
+      const formattedAmount = Number(paymentDetails.amount).toString();
       
-      // Construct UPI URL with proper encoding and formatted amount
-      const upiParams = new URLSearchParams({
-        pa: paymentDetails.upiId,
-        pn: 'Merchant',
-        tn: paymentDetails.description,
-        am: formattedAmount,
-        cu: 'INR'
-      });
-      
-      const upiUrl = `upi://pay?${upiParams.toString()}`;
+      // Create a minimal UPI URL with just the essential parameters
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&am=${formattedAmount}&cu=INR`;
 
-      // For mobile devices, try to open the UPI app directly
+      // For mobile devices, directly open the UPI app
       if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         window.location.href = upiUrl;
       } else {
-        // For desktop, show a message that this needs to be opened on a mobile device
         setError('Please open this payment page on your mobile device to use UPI payment.');
       }
     } catch (err) {
@@ -116,7 +96,7 @@ export default function PaymentPage() {
             Make Payment
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Recommended amount: ₹1 - ₹5,000
+            For testing, try with small amounts (₹1 - ₹10)
           </p>
         </div>
 
@@ -142,32 +122,16 @@ export default function PaymentPage() {
                 required
                 min={UPI_LIMITS.MIN_AMOUNT}
                 max={UPI_LIMITS.MAX_AMOUNT}
-                step="0.01"
+                step="1"
                 className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border border-gray-300 rounded-md p-2"
-                placeholder="0.00"
+                placeholder="Enter amount"
                 value={paymentDetails.amount || ''}
                 onChange={handleInputChange}
               />
             </div>
             <p className="mt-1 text-xs text-gray-500">
-              Limit: ₹{UPI_LIMITS.MIN_AMOUNT} - ₹{UPI_LIMITS.MAX_AMOUNT.toLocaleString()} per transaction
+              Start with small amounts for testing
             </p>
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <input
-              type="text"
-              name="description"
-              id="description"
-              required
-              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md p-2"
-              placeholder="Payment for..."
-              value={paymentDetails.description}
-              onChange={handleInputChange}
-            />
           </div>
 
           <div>
@@ -179,7 +143,6 @@ export default function PaymentPage() {
               name="upiId"
               id="upiId"
               required
-              pattern="[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z][a-zA-Z]{2,64}"
               className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md p-2"
               placeholder="example@upi"
               value={paymentDetails.upiId}
