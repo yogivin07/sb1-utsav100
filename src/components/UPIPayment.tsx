@@ -7,11 +7,11 @@ interface PaymentDetails {
   upiId: string;
 }
 
-// UPI transaction limits as per NPCI guidelines
+// Updated UPI transaction limits to be more conservative
 const UPI_LIMITS = {
   MIN_AMOUNT: 1,
-  MAX_AMOUNT: 100000, // ₹1,00,000 per transaction
-  MAX_DAILY: 200000,  // ₹2,00,000 per day
+  MAX_AMOUNT: 5000, // Reduced to ₹5,000 per transaction to avoid bank limits
+  MAX_DAILY: 25000,  // Reduced to ₹25,000 per day
 };
 
 export default function PaymentPage() {
@@ -51,8 +51,16 @@ export default function PaymentPage() {
       return false;
     }
     if (amount > UPI_LIMITS.MAX_AMOUNT) {
-      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
+      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}. Please try a smaller amount or contact your bank for higher limits.`);
       return false;
+    }
+    // Additional check for reasonable transaction amount
+    if (amount > 1000) {
+      const confirmed = window.confirm(`You are about to make a payment of ₹${amount}. Are you sure you want to proceed?`);
+      if (!confirmed) {
+        setError('Transaction cancelled');
+        return false;
+      }
     }
     return true;
   };
@@ -73,7 +81,7 @@ export default function PaymentPage() {
     }
 
     try {
-      // Format amount to exactly 2 decimal places
+      // Format amount to exactly 2 decimal places and ensure it's a small amount for testing
       const formattedAmount = paymentDetails.amount.toFixed(2);
       
       // Construct UPI URL with proper encoding and formatted amount
@@ -107,6 +115,9 @@ export default function PaymentPage() {
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
             Make Payment
           </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Recommended amount: ₹1 - ₹5,000
+          </p>
         </div>
 
         {error && (
