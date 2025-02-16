@@ -1,30 +1,55 @@
-import React, { useState } from 'react';
-import { IndianRupee, CreditCard, QrCode } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { IndianRupee, CreditCard, QrCode, Smartphone } from 'lucide-react';
+
 
 interface PaymentDetails {
   amount: number;
-  description: string;
   upiId: string;
 }
 
-// Updated UPI transaction limits to be more conservative
 const UPI_LIMITS = {
   MIN_AMOUNT: 1,
   MAX_AMOUNT: 5000,
-  MAX_DAILY: 25000,
 };
+
+const DEMO_UPI_ID = 'yogendra.pawar@okicici'; // Replace with your actual UPI ID
 
 export default function PaymentPage() {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     amount: 0,
-    description: '',
-    upiId: '',
+    upiId: DEMO_UPI_ID,
   });
   const [error, setError] = useState<string>('');
+  const [qrCode, setQrCode] = useState<string>('');
+  const [showQR, setShowQR] = useState(false);
+
+  useEffect(() => {
+    if (showQR && paymentDetails.amount > 0) {
+      generateQRCode();
+    }
+  }, [showQR, paymentDetails.amount]);
+
+  const generateQRCode = async () => {
+    try {
+      const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=DemoStore&am=${paymentDetails.amount}&cu=INR`;
+      const qrCodeDataUrl = await QRCode.toDataURL(upiUrl, {
+        width: 256,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#ffffff',
+        },
+      });
+      setQrCode(qrCodeDataUrl);
+    } catch (err) {
+      setError('Failed to generate QR code. Please try again.');
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setError('');
+    setShowQR(false);
 
     if (name === 'amount') {
       const numValue = parseFloat(value);
@@ -32,12 +57,8 @@ export default function PaymentPage() {
         setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
         return;
       }
+      setPaymentDetails(prev => ({ ...prev, amount: numValue || 0 }));
     }
-
-    setPaymentDetails(prev => ({
-      ...prev,
-      [name]: name === 'amount' ? parseFloat(value) || 0 : value
-    }));
   };
 
   const validateAmount = (amount: number): boolean => {
@@ -50,13 +71,13 @@ export default function PaymentPage() {
       return false;
     }
     if (amount > UPI_LIMITS.MAX_AMOUNT) {
-      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}. Please try a smaller amount.`);
+      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
       return false;
     }
     return true;
   };
 
-  const handleUPIPayment = (e: React.FormEvent) => {
+  const handleShowQR = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -64,27 +85,16 @@ export default function PaymentPage() {
       return;
     }
 
-    if (!paymentDetails.upiId.includes('@')) {
-      setError('Please enter a valid UPI ID (e.g., username@upi)');
+    setShowQR(true);
+  };
+
+  const handleDirectUPIPayment = () => {
+    if (!validateAmount(paymentDetails.amount)) {
       return;
     }
 
-    try {
-      // Remove any trailing zeros and decimal if whole number
-      const formattedAmount = Number(paymentDetails.amount).toString();
-      
-      // Create a minimal UPI URL with just the essential parameters
-      const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&am=${formattedAmount}&cu=INR`;
-
-      // For mobile devices, directly open the UPI app
-      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        window.location.href = upiUrl;
-      } else {
-        setError('Please open this payment page on your mobile device to use UPI payment.');
-      }
-    } catch (err) {
-      setError('Failed to initiate UPI payment. Please try again.');
-    }
+    const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=DemoStore&am=${paymentDetails.amount}&cu=INR`;
+    window.location.href = upiUrl;
   };
 
   return (
@@ -96,7 +106,7 @@ export default function PaymentPage() {
             Make Payment
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            For testing, try with small amounts (₹1 - ₹10)
+            Choose your preferred payment method
           </p>
         </div>
 
@@ -106,7 +116,7 @@ export default function PaymentPage() {
           </div>
         )}
 
-        <form onSubmit={handleUPIPayment} className="space-y-6">
+        <form onSubmit={handleShowQR} className="space-y-6">
           <div>
             <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
               Amount (₹)
@@ -130,25 +140,20 @@ export default function PaymentPage() {
               />
             </div>
             <p className="mt-1 text-xs text-gray-500">
-              Start with small amounts for testing
+              Amount range: ₹{UPI_LIMITS.MIN_AMOUNT} - ₹{UPI_LIMITS.MAX_AMOUNT}
             </p>
           </div>
 
-          <div>
-            <label htmlFor="upiId" className="block text-sm font-medium text-gray-700">
-              UPI ID
-            </label>
-            <input
-              type="text"
-              name="upiId"
-              id="upiId"
-              required
-              className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md p-2"
-              placeholder="example@upi"
-              value={paymentDetails.upiId}
-              onChange={handleInputChange}
-            />
-          </div>
+          {showQR && qrCode && (
+            <div className="text-center space-y-4">
+              <div className="bg-white p-4 rounded-lg inline-block shadow-md">
+                <img src={qrCode} alt="Payment QR Code" className="mx-auto" />
+              </div>
+              <p className="text-sm text-gray-600">
+                Scan this QR code with any UPI app to pay
+              </p>
+            </div>
+          )}
 
           <div className="space-y-4">
             <button
@@ -156,7 +161,16 @@ export default function PaymentPage() {
               className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
             >
               <QrCode className="mr-2 h-5 w-5" />
-              Pay with UPI
+              Show QR Code
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDirectUPIPayment}
+              className="w-full flex justify-center items-center py-3 px-4 border border-indigo-600 rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+            >
+              <Smartphone className="mr-2 h-5 w-5" />
+              Open UPI App
             </button>
 
             <button

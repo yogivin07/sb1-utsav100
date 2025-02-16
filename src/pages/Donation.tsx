@@ -1,14 +1,12 @@
 import React from 'react';
 import UPIPayment from '../components/UPIPayment';
 
-export default function Donation() {
+function App() {
   return (
-
-    
-        <div className="min-h-screen bg-gray-100">
-
-          <UPIPayment />
-       </div>
-    
+    <div className="min-h-screen bg-gray-100">
+      <UPIPayment />
+    </div>
   );
 }
+
+export default App;

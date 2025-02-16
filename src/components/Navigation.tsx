@@ -7,7 +7,9 @@ const navItems = [
   { name: 'About', href: '/about' },
   { name: 'Donation', href: '/donation' },
   { name: 'Portfolio', href: '/portfolio' },
-  { name: 'Contact', href: '/contact' }
+  { name: 'Contact', href: '/contact' },
+  { name: 'Upcomingevents', href: '/upcomingevents' },
+
 ];
 
 export default function Navigation() {

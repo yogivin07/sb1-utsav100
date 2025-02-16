@@ -26,7 +26,13 @@ const navigationItems = [
     label: 'Contact',
     path: '/contact',
     description: 'Get in touch'
-  }
+  },
+  {
+    icon: Compass,
+    label: 'Upcomingevents',
+    path: '/upcomingevents',
+    description: 'Get in touch'
+  },
 ];
 
 export default function SecondaryNavigation() {
