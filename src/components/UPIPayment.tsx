@@ -1,194 +1,192 @@
-import React, { useState, useEffect } from 'react';
-import { IndianRupee, CreditCard, QrCode, Smartphone } from 'lucide-react';
+import React, { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import { IndianRupee, QrCode, Copy, CheckCircle2, User, Mail, Phone } from 'lucide-react';
 
-
-interface PaymentDetails {
-  amount: number;
+interface UPIPaymentProps {
   upiId: string;
+  merchantName: string;
 }
 
-const UPI_LIMITS = {
-  MIN_AMOUNT: 1,
-  MAX_AMOUNT: 5000,
-};
+interface UserDetails {
+  name: string;
+  email: string;
+  phone: string;
+  amount: number;
+}
 
-const DEMO_UPI_ID = 'yogendra.pawar@okicici'; // Replace with your actual UPI ID
-
-export default function PaymentPage() {
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-    amount: 0,
-    upiId: DEMO_UPI_ID,
-  });
-  const [error, setError] = useState<string>('');
-  const [qrCode, setQrCode] = useState<string>('');
+export function UPIPayment({ upiId, merchantName }: UPIPaymentProps) {
+  const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [userDetails, setUserDetails] = useState<UserDetails>({
+    name: '',
+    email: '',
+    phone: '',
+    amount: 0
+  });
 
-  useEffect(() => {
-    if (showQR && paymentDetails.amount > 0) {
-      generateQRCode();
-    }
-  }, [showQR, paymentDetails.amount]);
+  // Generate UPI URL
+  const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${userDetails.amount}&cu=INR`;
 
-  const generateQRCode = async () => {
+  const handleCopy = async () => {
     try {
-      const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=DemoStore&am=${paymentDetails.amount}&cu=INR`;
-      const qrCodeDataUrl = await QRCode.toDataURL(upiUrl, {
-        width: 256,
-        margin: 1,
-        color: {
-          dark: '#000000',
-          light: '#ffffff',
-        },
-      });
-      setQrCode(qrCodeDataUrl);
+      await navigator.clipboard.writeText(upiUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      setError('Failed to generate QR code. Please try again.');
+      console.error('Failed to copy:', err);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowQR(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setError('');
-    setShowQR(false);
-
-    if (name === 'amount') {
-      const numValue = parseFloat(value);
-      if (numValue > UPI_LIMITS.MAX_AMOUNT) {
-        setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
-        return;
-      }
-      setPaymentDetails(prev => ({ ...prev, amount: numValue || 0 }));
-    }
+    setUserDetails(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const validateAmount = (amount: number): boolean => {
-    if (isNaN(amount) || amount <= 0) {
-      setError('Please enter a valid amount');
-      return false;
-    }
-    if (amount < UPI_LIMITS.MIN_AMOUNT) {
-      setError(`Minimum transaction amount is ₹${UPI_LIMITS.MIN_AMOUNT}`);
-      return false;
-    }
-    if (amount > UPI_LIMITS.MAX_AMOUNT) {
-      setError(`Maximum transaction amount is ₹${UPI_LIMITS.MAX_AMOUNT.toLocaleString()}`);
-      return false;
-    }
-    return true;
-  };
+  if (!showQR) {
+    return (
+      <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 space-y-6">
+        <div className="flex items-center space-x-2">
+          <IndianRupee className="w-6 h-6 text-green-600" />
+          <h2 className="text-xl font-semibold text-gray-800">Payment Details</h2>
+        </div>
 
-  const handleShowQR = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (!validateAmount(paymentDetails.amount)) {
-      return;
-    }
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <User className="w-4 h-4" />
+              <span>Full Name</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              required
+              value={userDetails.name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your full name"
+            />
+          </div>
 
-    setShowQR(true);
-  };
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <Mail className="w-4 h-4" />
+              <span>Email</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              value={userDetails.email}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your email"
+            />
+          </div>
 
-  const handleDirectUPIPayment = () => {
-    if (!validateAmount(paymentDetails.amount)) {
-      return;
-    }
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <Phone className="w-4 h-4" />
+              <span>Phone Number</span>
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              required
+              value={userDetails.phone}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your phone number"
+            />
+          </div>
 
-    const upiUrl = `upi://pay?pa=${encodeURIComponent(paymentDetails.upiId)}&pn=DemoStore&am=${paymentDetails.amount}&cu=INR`;
-    window.location.href = upiUrl;
-  };
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+              <IndianRupee className="w-4 h-4" />
+              <span>Amount (₹)</span>
+            </label>
+            <input
+              type="number"
+              name="amount"
+              required
+              min="1"
+              step="0.01"
+              value={userDetails.amount || ''}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter amount"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          >
+            Generate Payment QR
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
-        <div className="text-center mb-8">
-          <IndianRupee className="mx-auto h-12 w-12 text-indigo-600" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Make Payment
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Choose your preferred payment method
-          </p>
+    <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 space-y-6">
+      <div className="flex items-center space-x-2">
+        <IndianRupee className="w-6 h-6 text-green-600" />
+        <h2 className="text-xl font-semibold text-gray-800">UPI Payment</h2>
+      </div>
+
+      <div className="space-y-4">
+        <div className="text-center space-y-2">
+          <p className="text-gray-600">Scan QR code to pay</p>
+          <p className="text-2xl font-bold text-gray-800">₹{Number(userDetails.amount).toFixed(2)}</p>
+          <p className="text-sm text-gray-600">Payment for: {userDetails.name}</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-md bg-red-50 border border-red-200">
-            <p className="text-sm text-red-600">{error}</p>
+        <div className="flex justify-center">
+          <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+            <QRCodeSVG value={upiUrl} size={200} />
           </div>
-        )}
-
-        <form onSubmit={handleShowQR} className="space-y-6">
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-              Amount (₹)
-            </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 sm:text-sm">₹</span>
-              </div>
-              <input
-                type="number"
-                name="amount"
-                id="amount"
-                required
-                min={UPI_LIMITS.MIN_AMOUNT}
-                max={UPI_LIMITS.MAX_AMOUNT}
-                step="1"
-                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border border-gray-300 rounded-md p-2"
-                placeholder="Enter amount"
-                value={paymentDetails.amount || ''}
-                onChange={handleInputChange}
-              />
-            </div>
-            <p className="mt-1 text-xs text-gray-500">
-              Amount range: ₹{UPI_LIMITS.MIN_AMOUNT} - ₹{UPI_LIMITS.MAX_AMOUNT}
-            </p>
-          </div>
-
-          {showQR && qrCode && (
-            <div className="text-center space-y-4">
-              <div className="bg-white p-4 rounded-lg inline-block shadow-md">
-                <img src={qrCode} alt="Payment QR Code" className="mx-auto" />
-              </div>
-              <p className="text-sm text-gray-600">
-                Scan this QR code with any UPI app to pay
-              </p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <button
-              type="submit"
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-            >
-              <QrCode className="mr-2 h-5 w-5" />
-              Show QR Code
-            </button>
-
-            <button
-              type="button"
-              onClick={handleDirectUPIPayment}
-              className="w-full flex justify-center items-center py-3 px-4 border border-indigo-600 rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
-            >
-              <Smartphone className="mr-2 h-5 w-5" />
-              Open UPI App
-            </button>
-
-            <button
-              type="button"
-              disabled
-              className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-50 cursor-not-allowed"
-            >
-              <CreditCard className="mr-2 h-5 w-5" />
-              Pay with Card (Coming Soon)
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-6">
-          <p className="text-center text-sm text-gray-500">
-            Secure payments powered by UPI
-          </p>
         </div>
+
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600 text-center">Or use UPI ID</p>
+          <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <QrCode className="w-5 h-5 text-gray-500" />
+              <span className="text-gray-700 font-medium">{upiId}</span>
+            </div>
+            <button
+              onClick={handleCopy}
+              className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+              title="Copy UPI ID"
+            >
+              {copied ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+              ) : (
+                <Copy className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="text-center text-sm text-gray-500">
+          <p>Paying to: {merchantName}</p>
+        </div>
+
+        <button
+          onClick={() => setShowQR(false)}
+          className="w-full mt-4 bg-gray-100 text-gray-600 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors"
+        >
+          Back to Form
+        </button>
       </div>
     </div>
   );
