@@ -5,19 +5,19 @@ const banners = [
   {
     id: 1,
     title: "",
-    description: "Experience Innovation",
+    description: "",
     image: "https://skenergy-372636382.imgix.net/IMG20220831125514.jpg",
   },
   {
     id: 2,
     title: "",
-    description: "Crafting tomorrow's experiences with today's technology",
+    description: "",
     image: "https://skenergy-372636382.imgix.net/IMG20220831125530.jpg",
   },
   {
     id: 3,
     title: "",
-    description: "Where imagination meets precision",
+    description: "",
     image: "https://skenergy-372636382.imgix.net/khatavbannerimg.jpg",
   },
 

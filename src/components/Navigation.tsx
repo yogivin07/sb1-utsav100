@@ -5,10 +5,11 @@ import Button from './Button';
 
 const navItems = [
   { name: 'About', href: '/about' },
-  { name: 'Donation', href: '/donation' },
+  { name: 'Donation', href: 'https://dancing-marzipan-d5eb05.netlify.app/' },
   { name: 'Portfolio', href: '/portfolio' },
   { name: 'Contact', href: '/contact' },
   { name: 'Upcomingevents', href: '/upcomingevents' },
+  
 
 ];
 

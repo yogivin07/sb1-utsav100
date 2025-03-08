@@ -12,14 +12,14 @@ const navigationItems = [
   {
     icon: Compass,
     label: 'Donation',
-    path: '/donation',
+    path: '/dontaion',
     description: 'Explore our services'
   },
   {
     icon: Briefcase,
     label: 'Portfolio',
     path: '/portfolio',
-    description: 'View our work'
+    description: 'View our tradition'
   },
   {
     icon: Phone,
@@ -33,6 +33,7 @@ const navigationItems = [
     path: '/upcomingevents',
     description: 'Get in touch'
   },
+  
 ];
 
 export default function SecondaryNavigation() {
