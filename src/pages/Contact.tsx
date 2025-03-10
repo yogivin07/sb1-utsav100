@@ -13,7 +13,7 @@ export default function Contact() {
          <p>
         
         
-        support@skenergy.com
+        
         
     
         </p>
