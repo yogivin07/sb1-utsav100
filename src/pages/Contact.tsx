@@ -9,7 +9,7 @@ export default function Contact() {
         खटाव बिल्डिंग सार्वजनिक उत्सव मंडळ, वर्ष १००.
     
         </p>
-         
+          yogendra.pawar@skenergy.com
          <p>
         
         
