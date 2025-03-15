@@ -9,7 +9,7 @@ export default function Contact() {
     
         </p>
           yogendra.pawar@skenergy.com
-          Test
+      
           
          <p>
         
