@@ -1,18 +1,4 @@
 [[redirects]]
-  from = "/home"
-  to = "/"
-  status = 301
-  force = true
-  
-
-[[redirects]]
-  from = "/about"
-  to =   "https://genuine-boba-3154ec.netlify.app/about"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/portfolio"
-  to =   "https://genuine-boba-3154ec.netlify.app/portfolio"
-  status = 301
-  force = true
+from = “/*”
+to = “/index.html”
+status = 200
