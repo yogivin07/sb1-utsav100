@@ -7,18 +7,25 @@
 
 [[redirects]]
   from = "/about"
-  to =   "https://genuine-boba-3154ec.netlify.app/"
+  to =   "https://kbsum1926.in/"
   status = 301
   force = true
 
 [[redirects]]
   from = "/portfolio"
-  to =   "https://genuine-boba-3154ec.netlify.app/"
+  to =   "https://kbsum1926.in/"
   status = 301
   force = true
 
 [[redirects]]
   from = "/contact"
-  to =   "https://genuine-boba-3154ec.netlify.app/"
+  to =   "https://kbsum1926.in/"
+  status = 301
+  force = true
+
+
+[[redirects]]
+  from = "/upcomingevents"
+  to =   "https://kbsum1926.in/"
   status = 301
   force = true

@@ -12,7 +12,7 @@ const navigationItems = [
   {
     icon: Compass,
     label: 'Donation',
-    path: '/dontaion',
+    path: 'https://dancing-marzipan-d5eb05.netlify.app/',
     description: 'Explore our services'
   },
   {
