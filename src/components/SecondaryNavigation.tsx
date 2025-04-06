@@ -33,12 +33,7 @@ const navigationItems = [
     path: '/upcomingevents',
     description: 'Get in touch'
   },
-  {
-    icon: Compass,
-    label: 'Makepayment',
-    path: '/makepayment',
-    description: 'Get in touch'
-  },
+  
   
 ];
 
