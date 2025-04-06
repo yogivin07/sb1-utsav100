@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import Portfolio from './pages/Portfolio';
 import Contact from './pages/Contact';
 import About from './pages/About';
-
+import Makepayment from './pages/Makepayment';
 
 
 import { ProductCatalog } from './components/ProductCatalog' ;
@@ -24,7 +24,7 @@ function App() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
-          
+          <Route path="/makepayment" element={<Makepayment />} />
           
         </Routes>
       </div>
