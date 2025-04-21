@@ -6,7 +6,7 @@ import Button from './Button';
 const navItems = [
   { name: 'About', href: '/about' },
   { name: 'Donation', href: 'https://dancing-marzipan-d5eb05.netlify.app/' },
-  { name: 'Portfolio', href: '/portfolio' },
+  { name: 'Portfolio', href: 'https://yogendrapawar.wixstudio.com/my-site-3' },
   { name: 'Contact', href: '/contact' },
   { name: 'Upcomingevents', href: '/upcomingevents' },
   

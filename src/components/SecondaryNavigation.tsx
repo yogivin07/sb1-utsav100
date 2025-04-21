@@ -18,7 +18,7 @@ const navigationItems = [
   {
     icon: Briefcase,
     label: 'Portfolio',
-    path: '/portfolio',
+    path: 'https://yogendrapawar.wixstudio.com/my-site-3',
     description: 'View our tradition'
   },
   {
