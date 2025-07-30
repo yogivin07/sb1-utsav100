@@ -29,8 +29,8 @@ const navigationItems = [
   },
   {
     icon: Compass,
-    label: 'Upcomingevents',
-    path: '/upcomingevents',
+    label: '100 Years',
+    path: 'https://yogendrapawar.wixstudio.com/my-site-1',
     description: 'Get in touch'
   },
   
