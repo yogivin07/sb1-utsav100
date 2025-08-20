@@ -33,6 +33,12 @@ const navigationItems = [
     path: 'https://yogendrapawar.wixstudio.com/my-site-1',
     description: 'Get in touch'
   },
+  {
+    icon: Compass,
+    label: 'Upload Selfie',
+    path: 'https://lucky-cupcake-1cdddf.netlify.app/',
+    description: 'Get in touch'
+  },
   
   
 ];
