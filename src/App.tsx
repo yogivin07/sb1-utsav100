@@ -28,11 +28,13 @@ function App() {
           
         </Routes>
       </div>
-
+      <div className="powr-popup" id="ec4cb8fc_1755972151"></div>
+      <script src="https://www.powr.io/powr.js?platform=html"></script>
     
     
 
     </Router>
+    
       
     
   );

@@ -12,6 +12,7 @@ export default function Home() {
           <h1 className="mb-4 text-2xl font-bold text-gray-900">"गणपती बाप्पा मोरया!</h1>
           <p className="text-gray-600">
           "गणपती बाप्पा मोरया!
+          
           </p>
           <p>
 आज आपल्या लाडक्या गणपती बाप्पाच्या आगमनाचा १०० वा उत्सव साजरा करताना, आपण सर्वांनी एकत्र येऊन या परंपरेची भव्यता आणि पावित्र्य जपले आहे. 
@@ -22,7 +23,11 @@ export default function Home() {
 गणपती बाप्पा मोरया
           </p>
         </div>
+        <div className="powr-popup" id="ec4cb8fc_1755972151"></div><script src="https://www.powr.io/powr.js?platform=html"></script>
+        
       </main>
+      <div className="powr-popup" id="ec4cb8fc_1755972151"></div><script src="https://www.powr.io/powr.js?platform=html"></script>
     </div>
+    
   );
 }
