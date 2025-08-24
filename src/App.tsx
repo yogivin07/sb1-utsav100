@@ -25,8 +25,8 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           
-          
         </Routes>
+        
       </div>
       <div className="powr-popup" id="ec4cb8fc_1755972151"></div>
       <script src="https://www.powr.io/powr.js?platform=html"></script>
@@ -34,6 +34,7 @@ function App() {
     
 
     </Router>
+    
     
       
     
