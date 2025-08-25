@@ -6,7 +6,7 @@ const banners = [
     id: 1,
     title: "",
     description: "",
-    image: "https://skenergy-372636382.imgix.net/IMG20220831125514.jpg",
+    image: "https://uskjyykpwxgjynrvgncv.supabase.co/storage/v1/object/public/uploaded-files/2e5ffe33-ee85-45e0-ae92-fdfd1464f855/h5ee0k8r9_npd3np9th_kathav%20bldg%2010%20x%2012.jpg",
   },
   {
     id: 2,
