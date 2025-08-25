@@ -12,13 +12,13 @@ const banners = [
     id: 2,
     title: "",
     description: "",
-    image: "https://skenergy-372636382.imgix.net/IMG20220831125530.jpg",
+    image: "https://uskjyykpwxgjynrvgncv.supabase.co/storage/v1/object/public/uploaded-files/95374bd2-c92a-4910-8e97-305f2a064adf/t1gqt7xpx_logo-01-01-01.jpg",
   },
   {
     id: 3,
     title: "",
     description: "",
-    image: "https://skenergy-372636382.imgix.net/khatavbannerimg.jpg",
+    image: "https://uskjyykpwxgjynrvgncv.supabase.co/storage/v1/object/public/uploaded-files/2e5ffe33-ee85-45e0-ae92-fdfd1464f855/WhatsApp%20Image%202025-08-18%20at%2016.29.51_c243e11e.jpg",
   },
 
  
