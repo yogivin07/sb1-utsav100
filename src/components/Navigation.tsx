@@ -9,6 +9,7 @@ const navItems = [
   { name: 'Portfolio', href: 'https://yogendrapawar.wixstudio.com/my-site-3' },
   { name: 'Contact', href: '/contact' },
   { name: '100 Years', href: 'https://yogendrapawar.wixstudio.com/my-site-1' },
+  { name: 'Upload Selfie', href: 'https://upload-storage-media.deploypad.app/' },
   
   
 

@@ -33,6 +33,12 @@ const navigationItems = [
     path: 'https://yogendrapawar.wixstudio.com/my-site-1',
     description: 'Get in touch'
   },
+  {
+    icon: Compass,
+    label: 'Upload Selfie',
+    path: 'https://upload-storage-media.deploypad.app/',
+    description: 'Get in touch'
+  },
  
   
   
